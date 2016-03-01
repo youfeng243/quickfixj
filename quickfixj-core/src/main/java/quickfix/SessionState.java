@@ -1,23 +1,26 @@
 /*******************************************************************************
  * Copyright (c) quickfixengine.org  All rights reserved.
- *
+ * <p>
  * This file is part of the QuickFIX FIX Engine
- *
+ * <p>
  * This file may be distributed under the terms of the quickfixengine.org
  * license as defined by quickfixengine.org and appearing in the file
  * LICENSE included in the packaging of this file.
- *
+ * <p>
  * This file is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING
  * THE WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A
  * PARTICULAR PURPOSE.
- *
+ * <p>
  * See http://www.quickfixengine.org/LICENSE for licensing information.
- *
+ * <p>
  * Contact ask@quickfixengine.org if any conditions of this licensing
  * are not clear to you.
  ******************************************************************************/
 
 package quickfix;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -35,6 +38,8 @@ import java.util.concurrent.locks.ReentrantLock;
 public final class SessionState {
     private final Object lock;
     private final Log log;
+
+    private final static Logger Log = LoggerFactory.getLogger(LogUtil.class);
 
     // MessageStore implementation must be thread safe
     private final MessageStore messageStore;
@@ -75,7 +80,7 @@ public final class SessionState {
     private final Map<Integer, Message> messageQueue = new LinkedHashMap<Integer, Message>();
 
     public SessionState(Object lock, Log log, int heartBeatInterval, boolean initiator, MessageStore messageStore,
-            double testRequestDelayMultiplier) {
+                        double testRequestDelayMultiplier) {
         this.lock = lock;
         this.initiator = initiator;
         this.messageStore = messageStore;
@@ -379,6 +384,9 @@ public final class SessionState {
 
     public void reset() {
         try {
+            if (messageStore == null) {
+                Log.error("ERROR NULL Point################");
+            }
             messageStore.reset();
         } catch (IOException e) {
             throw new RuntimeError(e);
